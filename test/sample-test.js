@@ -9,7 +9,7 @@ describe("NFTMarket", function () {
     const marketAddress = market.address;
 
     const NFT = await ethers.getContractFactory('NFT');
-    const nft = NFT.deploy(marketAddress);
+    const nft = await NFT.deploy(marketAddress);
     await nft.deployed();
     const nftContractAddress = nft.address;
     
@@ -24,12 +24,24 @@ describe("NFTMarket", function () {
     await market.createMarketItem(nftContractAddress, 1, auctionPrice, { value: listingPrice });
     await market.createMarketItem(nftContractAddress, 2, auctionPrice, { value: listingPrice });
 
-    const [_, buyerAddress] = await ethers.getSigner();
+    const [_, buyerAddress] = await ethers.getSigners();
 
     await market.connect(buyerAddress).createMarketSale(nftContractAddress, 1, { value: auctionPrice });
 
-    const items = await market.fetchMarketItems();
+    let items = await market.fetchMarketItems();
 
+
+    items = await Promise.all(items.map(async i => {
+        const tokenUri = await nft.tokenURI(i.tokenId)
+        let item = {
+          price: i.price.toString(),
+          tokenId: i.tokenId.toString(),
+          seller: i.seller,
+          owner: i.owner,
+          tokenUri
+        }
+        return item
+    }))
     console.log('items: ', items);
 
   });
