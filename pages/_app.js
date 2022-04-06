@@ -1,14 +1,10 @@
-import Link from 'next/link'
+import Navbar from '../components/Navbar'
 import '../styles/globals.css'
-
-
 
 function MyApp({ Component, pageProps }) {
   return (
     <div>
-      <nav className='border-b p-6'>
-
-      </nav>
+      <Navbar />
       <Component {...pageProps} />
     </div>
   )
